@@ -1,5 +1,8 @@
 {
     "cSpell.words": [
+        "arange",
+        "einops",
+        "randperm",
         "relu"
     ]
 }
