@@ -16,6 +16,7 @@ plotly = "^5.22.0"
 transformers = "^4.41.0"
 datasets = "^2.19.1"
 ipython = "^8.24.0"
+transformer-lens = "^1.17.0"
 
 
 [build-system]
