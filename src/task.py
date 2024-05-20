@@ -8,7 +8,23 @@ import einops
 import torch
 
 
-def make_data_and_labels(
+def make_dataset_and_labels(p: int, device: str):
+    # The input to the transformer is a sequence of three tokens |a|b|=|
+    a_vector: torch.Tensor = einops.repeat(torch.arange(p), "i -> (i j)", j=p)
+    b_vector: torch.Tensor = einops.repeat(torch.arange(p), "j -> (i j)", i=p)
+
+    # We'll use 0 to p-1 as numbers, and p as the token for the = sign.
+    equals_vector: torch.Tensor = einops.repeat(torch.tensor(p), " -> (i j)", i=p, j=p)
+
+    dataset: torch.tensor = torch.stack([a_vector, b_vector, equals_vector], dim=1).to(
+        device
+    )
+    labels: torch.tensor = (dataset[:, 0] + dataset[:, 1]) % p
+
+    return dataset, labels
+
+
+def make_train_and_test_data(
     p: int, device: str, data_seed: int, training_fraction: float
 ) -> tuple[torch.tensor, torch.tensor, torch.tensor, torch.tensor]:
     """
@@ -23,18 +39,7 @@ def make_data_and_labels(
     Returns:
         tuple[torch.tensor, torch.tensor, torch.tensor, torch.tensor]: A tuple containing the training data, training labels, testing data, and testing labels.
     """
-
-    # The input to the transformer is a sequence of three tokens |a|b|=|
-    a_vector: torch.Tensor = einops.repeat(torch.arange(p), "i -> (i j)", j=p)
-    b_vector: torch.Tensor = einops.repeat(torch.arange(p), "j -> (i j)", i=p)
-
-    # We'll use 0 to p-1 as numbers, and p as the token for the = sign.
-    equals_vector: torch.Tensor = einops.repeat(torch.tensor(p), " -> (i j)", i=p, j=p)
-
-    dataset: torch.tensor = torch.stack([a_vector, b_vector, equals_vector], dim=1).to(
-        device
-    )
-    labels: torch.tensor = (dataset[:, 0] + dataset[:, 1]) % p
+    dataset, labels = make_dataset_and_labels(p, device)
 
     torch.manual_seed(data_seed)
 
