@@ -2,7 +2,9 @@
     "cSpell.words": [
         "arange",
         "einops",
+        "probs",
         "randperm",
-        "relu"
+        "relu",
+        "softmax"
     ]
 }
