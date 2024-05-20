@@ -9,7 +9,7 @@ from typing import Final
 from transformer_lens import HookedTransformerConfig, HookedTransformer
 
 
-def get_hooked_transformer_model(p: int, device: str):
+def get_hooked_transformer(p: int, device: str):
     """
     Returns a HookedTransformerModel instance with the specified configuration.
 
