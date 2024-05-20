@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "bluedot-intro-to-mech-interp"
+version = "0.1.0"
+description = ""
+authors = ["Jonathan Raines <jr0278@bristol.ac.uk>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+torch = "^2.3.0"
+numpy = "^1.26.4"
+einops = "^0.8.0"
+einsum = "^0.3.0"
+tqdm = "^4.66.4"
+plotly = "^5.22.0"
+transformers = "^4.41.0"
+datasets = "^2.19.1"
+ipython = "^8.24.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
