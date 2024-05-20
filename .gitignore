@@ -1,2 +1,8 @@
 # Virtual Environment
 .venv/
+
+# Pycache
+__pycache__/
+
+# Saved Models
+persist/
