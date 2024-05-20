@@ -38,14 +38,15 @@ def make_data_and_labels(
 
     torch.manual_seed(data_seed)
 
-    indices = torch.randperm(p**2)
+    indices: torch.Tensor = torch.randperm(p**2)
     cutoff: int = int(p**2 * training_fraction)
     train_indices = indices[:cutoff]
     test_indices = indices[cutoff:]
 
-    train_data = dataset[train_indices]
-    train_labels = labels[train_indices]
-    test_data = dataset[test_indices]
-    test_labels = labels[test_indices]
+    # These will all also be on device because dataset and labels are on device.
+    train_data: torch.Tensor = dataset[train_indices]
+    train_labels: torch.Tensor = labels[train_indices]
+    test_data: torch.Tensor = dataset[test_indices]
+    test_labels: torch.Tensor = labels[test_indices]
 
     return train_data, train_labels, test_data, test_labels
