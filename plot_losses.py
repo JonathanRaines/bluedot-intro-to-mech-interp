@@ -4,7 +4,7 @@ import torch
 from src import plot
 
 
-def make_figures() -> None:
+def main() -> None:
     model = torch.load("persist/grokking_demo.pth")
 
     pd.DataFrame.from_records([model["train_losses"], model["test_losses"]]).to_csv(
@@ -16,4 +16,4 @@ def make_figures() -> None:
 
 
 if __name__ == "__main__":
-    make_figures()
+    main()
