@@ -10,15 +10,18 @@ from src import utils
 
 
 def main():
+    # Load the model saved from the training Google Colab
     hooked_model: transformer_lens.HookedTransformer = utils.load_model(
         path="persist/grokking_demo.pth", mod=const.MOD, device="cpu"
     )
 
+    # Make a dataset and labels for the model
     dataset, labels = task.make_dataset_and_labels(
         p=const.MOD,
         device="cpu",
     )
 
+    # Get a prediction for every possible input and cache the activations
     original_logits, cache = hooked_model.run_with_cache(dataset)
 
     print(f"{original_logits.numel():,}")
@@ -54,10 +57,10 @@ def main():
 
 
 def plot_attention_patterns(cache, P: int):
-    pattern_a = cache["pattern", 0, "attn"][:, :, -1, 0]
-    pattern_b = cache["pattern", 0, "attn"][:, :, -1, 1]
+    # pattern_a = cache["pattern", 0, "attn"][:, :, -1, 0]
+    # pattern_b = cache["pattern", 0, "attn"][:, :, -1, 1]
     neuron_acts = cache["post", 0, "mlp"][:, -1, :]
-    neuron_pre_acts = cache["pre", 0, "mlp"][:, -1, :]
+    # neuron_pre_acts = cache["pre", 0, "mlp"][:, -1, :]
 
     plot.imshow(
         cache["pattern", 0].mean(dim=0)[:, -1, :],
@@ -117,16 +120,30 @@ def plot_attention_patterns(cache, P: int):
 
 
 def singular_value_decomposition(W_E):
-    U, S, Vh = torch.svd(W_E)
-    _, S_rand, _ = torch.svd(torch.randn_like(W_E))
-    plot.multiline(
+    U, S, _ = torch.linalg.svd(W_E)
+    _, S_rand, _ = torch.linalg.svd(torch.randn_like(W_E))
+
+    fig = plot.multiline(
         [S, S_rand],
         title="Singular Values",
         labels=["W_E", "Random Matrix for Comparison"],
-    ).write_image("figures/singular_values.png")
+        xaxis="Input Vocabulary",
+    )
+    fig.write_image("figures/singular_values.png")
+    plot.line_to_csv(fig, "figures/singular_values.csv")
+
     plot.imshow(U, title="Principal Components on the Input").write_image(
         "figures/principal_components_on_the_input.png"
     )
+
+    # The singular values plot shows the first 8 elements of the embeddings are the most important
+    # The next two are slightly important, the rest are basically unused.
+    plot.imshow(
+        U[:, :10],
+        title="Principal Components on Most Important Inputs",
+        aspect="auto",
+        xaxis="Input Vocabulary",
+    ).write_image("figures/principal_components_on_the_input_most_important.png")
 
 
 if __name__ == "__main__":
