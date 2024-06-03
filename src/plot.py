@@ -1,5 +1,6 @@
 import plotly.express as px
 import plotly.graph_objects as go
+import pandas as pd
 import numpy as np
 from transformer_lens import utils
 
@@ -65,3 +66,10 @@ def multiline(tensors, xaxis="", yaxis="", labels=None, **kwargs) -> go.Figure:
         **kwargs,
     )
     return fig
+
+
+def line_to_csv(fig: go.Figure, path: str) -> None:
+    """Writes a Plotly line/scatter data to a CSV file for use in Latex/Typst graphs."""
+    series = {series.name: series.y for series in fig.data}
+    series["x"] = fig.data[0].x
+    pd.DataFrame.from_dict(series).to_csv(path, index=False)
