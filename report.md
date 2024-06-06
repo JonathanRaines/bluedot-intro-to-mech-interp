@@ -1,9 +1,10 @@
 # BlueDot AI Alignment Introduction Project
 
-I undertook this project as part of the BlueDot ...
+I undertook this project as part of the [BlueDot](https://bluedot.org/) [AI Safety Fundamentals](https://aisafetyfundamentals.com/) - AI Alignment Course.
 
 ## Aims
-My aim during this project was to teach myself the basics of Mechanistic Interpretability. To this end, I recreated the code for a recent paper, _Progress Measures for Grokking via Mechanistic Interpretability_, by Neel Nanda et al (https://doi.org/10.48550/arXiv.2301.05217). The paper also has a great walkthrough video, and code examples in the form of a Google Colab making it an excellent learning resource. 
+My aim during this project was to teach myself the basics of Mechanistic Interpretability. To this end, I recreated the code for a recent paper, _Progress Measures for Grokking via Mechanistic Interpretability_, by Neel Nanda et al (https://doi.org/10.48550/arXiv.2301.05217). The paper also has a [great walkthrough video](https://www.youtube.com/watch?v=ob4vuiqG2Go&list=PL7m7hLIqA0hqsReJ0NYhyN3xiFQW9ko1h&index=1), and code examples in the form of a [Google Colab](https://colab.research.google.com/github/neelnanda-io/TransformerLens/blob/main/demos/Grokking_Demo.ipynb) making it an excellent learning resource. 
+_(Please note, this project is mainly for my own learning and not intended as a teaching resource)_
 
 The paper in question trains a simple transformer network to do base 113 modular arithmetic. The goal of the exercise is to understand how the networks implements the algorithm. 
 
