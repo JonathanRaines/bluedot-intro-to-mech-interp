@@ -53,6 +53,8 @@ We can see three regions to this graph, I've added vertical lines to separate th
 
 ## Analysis
 
+The code for this section is in [basic_analysis.py](basic_analysis.py) and [fourier_analysis.py](basic_analysis.py)
+
 ### Embeddings
 
 Starting from the inputs, I first use Singular Value Decomposition (as simple as calling `torch.linalg.svd()`) on the embedding matrix. This is the 113 x 128 matrix the 113 dimension one-hot vector is multiplied by to give us the 128 input to the transformer attention block. The one-hot vector essentially "looks up" a row in the embedding vector. 
