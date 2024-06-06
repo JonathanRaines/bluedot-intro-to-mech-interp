@@ -9,12 +9,12 @@ from typing import Final
 from transformer_lens import HookedTransformerConfig, HookedTransformer
 
 
-def get_hooked_transformer(p: int, device: str):
+def get_hooked_transformer(base: int, device: str):
     """
     Returns a HookedTransformerModel instance with the specified configuration.
 
     Args:
-        p (int): The number tokens in the vocabulary.
+        base (int): The modular base and number tokens in the vocabulary.
         device (str): The device to use for the model. "cpu" or "cuda".
 
     Returns:
@@ -28,8 +28,8 @@ def get_hooked_transformer(p: int, device: str):
         d_mlp=512,
         act_fn="relu",
         normalization_type=None,
-        d_vocab=p + 1,
-        d_vocab_out=p,
+        d_vocab=base + 1,  # +1 for the equals sign
+        d_vocab_out=base,
         n_ctx=3,
         init_weights=True,
         device=device,

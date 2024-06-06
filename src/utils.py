@@ -9,7 +9,7 @@ def load_model(
 ) -> transformer_lens.HookedTransformer:
     saved: dict = torch.load(path)
     hooked_model: transformer_lens.HookedTransformer = model.get_hooked_transformer(
-        p=mod, device=device
+        base=mod, device=device
     )
 
     hooked_model.load_state_dict(saved["model"])

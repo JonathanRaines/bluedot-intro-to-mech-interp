@@ -21,7 +21,7 @@ def main(model_path: str, base: int, device: str) -> None:
 
     # Make a dataset and labels for the model
     dataset, _ = task.make_dataset_and_labels(
-        p=const.MOD,
+        base=const.MOD,
         device=device,
     )
 
@@ -73,19 +73,6 @@ def main(model_path: str, base: int, device: str) -> None:
         fourier_basis, xaxis="Input", yaxis="Component", y=fourier_basis_names
     ).write_image("figures/fourier_basis.png")
 
-    # plot.line(
-    #     fourier_basis[:8],
-    #     xaxis="Input",
-    #     # line_labels=fourier_basis_names[:8],
-    #     title="First 8 Fourier Components",
-    # ).show()
-    # plot.line(
-    #     fourier_basis[25:29],
-    #     xaxis="Input",
-    #     # line_labels=fourier_basis_names[25:29],
-    #     title="Middle Fourier Components",
-    # ).show()
-
     # Multiplying the Fourier Basis by the singular values we can see how the singular values are composed sin and cos functions.
     # The rows correspond to the key frequencies from the previous plots.
     # The additional thing we learn from this is that it's using both the sin and cos of the 4 key frequencies.
@@ -100,6 +87,7 @@ def main(model_path: str, base: int, device: str) -> None:
 
     ## 2D Fourier
     # Show that for a given neuron, it's only activated by sin and cos terms of a given freq as well as constant terms.
+
     neuron_activations = cache["post", 0, "mlp"][:, -1, :]
     plot.imshow(
         fourier_basis @ neuron_activations[:, 0].reshape(base, base) @ fourier_basis.T,
@@ -110,7 +98,8 @@ def main(model_path: str, base: int, device: str) -> None:
         y=fourier_basis_names,
     ).write_image("figures/2d_fourier_transform_of_neuron_0.png")
 
-    ## Neuron Clusters
+    # Neuron Clusters
+    # ---------------
     fourier_neuron_activations = (
         fourier_basis
         @ einops.rearrange(
@@ -123,7 +112,10 @@ def main(model_path: str, base: int, device: str) -> None:
     print("fourier_neuron_activations", fourier_neuron_activations.shape)
 
     neuron_freq_norm = get_neuron_frequency_contributions(
-        base, device, hooked_model, fourier_neuron_activations
+        fourier_neuron_activations=fourier_neuron_activations,
+        num_neurons=neuron_activations.shape[1],
+        base=base,
+        device=device,
     )
     # We see again the key frequencies as lines across the plot.
     # Also most neurons appear to rely only on one neuron.
@@ -145,19 +137,22 @@ def main(model_path: str, base: int, device: str) -> None:
 
 
 def get_neuron_frequency_contributions(
-    base, device, hooked_model, fourier_neuron_activations
-):
+    fourier_neuron_activations: torch.Tensor,
+    num_neurons: int,
+    base: int,
+    device: str,
+) -> torch.Tensor:
     """Determine which key frequencies are most important for each neuron in the model."""
 
     # Initialise the tensor to store the normalized frequency contributions
-    neuron_freq_norm = torch.zeros(base // 2, hooked_model.cfg.d_mlp).to(
+    neuron_freq_norm: torch.Tensor = torch.zeros(base // 2, num_neurons).to(
         device
     )  # 56 (freq) x 512 (neurons in MLP)
 
     # Loop through the frequencies
     for freq in range(0, base // 2):
         # Generate the indices for the constant, sin, and cos terms in the fourier basis for this frequency
-        const_sin_cos_indices = [0, 2 * (freq + 1) - 1, 2 * (freq + 1)]
+        const_sin_cos_indices: list[int] = [0, 2 * (freq + 1) - 1, 2 * (freq + 1)]
 
         # For each combination of sin and cos terms at this frequency, sum the squared activations
         for x in const_sin_cos_indices:
@@ -182,6 +177,11 @@ def get_neuron_frequency_contributions(
 
 
 def make_fourier_basis(base: int, device: str) -> torch.Tensor:
+    """
+    Makes a base x base matrix
+    One axis corresponds to sin and cos of frequencies up to base // 2
+    The other axis represents possible inputs
+    """
     fourier_basis = []
     fourier_basis_names = []
     fourier_basis.append(torch.ones(base))

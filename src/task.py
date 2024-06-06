@@ -8,18 +8,35 @@ import einops
 import torch
 
 
-def make_dataset_and_labels(p: int, device: str):
+def make_dataset_and_labels(base: int, device: str):
+    """
+    Generate every possible combination of two numbers from 0 to base-1
+
+        Args:
+            base (int): The base for modular arithmetic and number of tokens in the vocabulary.
+            device (str): The device to store the tensors on.
+    """
     # The input to the transformer is a sequence of three tokens |a|b|=|
-    a_vector: torch.Tensor = einops.repeat(torch.arange(p), "i -> (i j)", j=p)
-    b_vector: torch.Tensor = einops.repeat(torch.arange(p), "j -> (i j)", i=p)
+    # torch.arange(base) creates a tensor of numbers from 0 to base-1 e.g. [0, 1, 2, 3, 4, ...]
+    # einops.repeat repeats the tensor along a new dimension, then squashes it back to 1D in two
+    # different ways to create the permeations of the numbers.
+    # [1, 2, 3,] -> [[1, 2, 3], [1, 2, 3], [1, 2, 3]] -> [[1, 1, 1, 2, 2, 2, 3, 3, 3]]
+    a_vector: torch.Tensor = einops.repeat(torch.arange(base), "i -> (i j)", j=base)
+    # [1, 2, 3,] -> [[1, 2, 3], [1, 2, 3], [1, 2, 3]] -> [[1, 2, 3, 1, 2, 3, 1, 2, 3]]
+    b_vector: torch.Tensor = einops.repeat(torch.arange(base), "j -> (i j)", i=base)
 
     # We'll use 0 to p-1 as numbers, and p as the token for the = sign.
-    equals_vector: torch.Tensor = einops.repeat(torch.tensor(p), " -> (i j)", i=p, j=p)
+    equals_vector: torch.Tensor = einops.repeat(
+        torch.tensor(base), " -> (i j)", i=base, j=base
+    )
 
+    # Combine the three vectors into a dataset tensor.
     dataset: torch.tensor = torch.stack([a_vector, b_vector, equals_vector], dim=1).to(
         device
     )
-    labels: torch.tensor = (dataset[:, 0] + dataset[:, 1]) % p
+
+    # Calculate the answers, the sum of the first two numbers modulo p.
+    labels: torch.tensor = (dataset[:, 0] + dataset[:, 1]) % base
 
     return dataset, labels
 
@@ -41,8 +58,10 @@ def make_train_and_test_data(
     """
     dataset, labels = make_dataset_and_labels(p, device)
 
+    # Set the random seed for reproducibility.
     torch.manual_seed(data_seed)
 
+    # Randomly select the data and labels.
     indices: torch.Tensor = torch.randperm(p**2)
     cutoff: int = int(p**2 * training_fraction)
     train_indices = indices[:cutoff]

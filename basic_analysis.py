@@ -17,7 +17,7 @@ def main():
 
     # Make a dataset and labels for the model
     dataset, labels = task.make_dataset_and_labels(
-        p=const.MOD,
+        base=const.MOD,
         device="cpu",
     )
 
@@ -116,6 +116,7 @@ def plot_attention_patterns(cache, P: int):
         xaxis="b",
         yaxis="a",
         facet_col=0,
+        facet_col_wrap=3,
     ).write_image("figures/first_5_neuron_activations.png")
 
 
